@@ -147,11 +147,17 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { d$auth } from "@/stores/auth";
+import { initFlowbite } from "flowbite";
 
 const router = useRouter();
 const authStore = d$auth();
+
+onMounted(() => {
+  initFlowbite();
+});
 
 const logout = async () => {
   try {

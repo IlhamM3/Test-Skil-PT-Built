@@ -30,7 +30,7 @@ export const d$Customer = defineStore("Customer", {
     async Api$DetailCustomer(id) {
       try {
         const { data } = await Api$Customer.DetailCustomer(id);
-        this.DataDetailCustomer = data;
+        return data;
       } catch (error) {
         throw error;
       }

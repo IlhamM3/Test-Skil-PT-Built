@@ -26,7 +26,7 @@ const routes = [
   {
     path: "/dashboard",
     component: MainLayout,
-    // meta: { Auth: true },
+    meta: { Auth: true },
     children: [
       { path: "", name: "dashboard", component: Summary },
       { path: "profile", name: "dashboard.profile", component: MyProfile },
