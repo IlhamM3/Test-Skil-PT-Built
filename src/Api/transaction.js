@@ -24,7 +24,7 @@ const GetTransactionAll = ({
   if (customerCode != null) params.customerCode = customerCode;
   if (salesCode != null) params.salesCode = salesCode;
 
-  return baseApi.get("customers", { params });
+  return baseApi.get("transactions", { params });
 };
 
 const DetailTransaction = (id) => baseApi.get(`transactions/${id}`);

@@ -1,7 +1,39 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { d$auth } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+const router = useRouter();
+const authStore = d$auth();
+const { GetDataProfile } = storeToRefs(authStore);
+
+const DataProfile = ref([]);
+onMounted(async () => {
+  await GetProfile();
+  DataProfile.value = GetDataProfile.value;
+});
+
+const logout = async () => {
+  try {
+    await authStore.Api$Logout();
+    router.replace({ name: "login" });
+  } catch (err) {
+    console.error(err);
+    errorMessage.value = err || "Logout gagal";
+  }
+};
+const GetProfile = async () => {
+  try {
+    await authStore.Api$Profile();
+  } catch (err) {
+    console.error(err);
+    errorMessage.value = err || "Logout gagal";
+  }
+};
+</script>
+
 <template>
-  <nav
-    class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700"
-  >
+  <nav class="fixed top-0 z-50 w-full border-b bg-gray-800 border-gray-700">
     <div class="px-3 py-3 lg:px-5 lg:pl-3">
       <div class="flex items-center justify-between">
         <div class="flex items-center justify-start rtl:justify-end">
@@ -10,7 +42,7 @@
             data-drawer-toggle="logo-sidebar"
             aria-controls="logo-sidebar"
             type="button"
-            class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            class="inline-flex items-center p-2 text-sm rounded-lg sm:hidden focus:outline-none focus:ring-2 text-white hover:bg-gray-700 focus:ring-gray-600"
           >
             <span class="sr-only">Open sidebar</span>
             <svg
@@ -27,7 +59,8 @@
               ></path>
             </svg>
           </button>
-          <a class="flex ms-2 md:me-24">
+          <a class="flex ms-4 md:me-24">
+            <img src="/favicon.ico" class="h-8 me-3" alt="Logo" />
             <span
               class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white"
               >Test Skill</span
@@ -39,57 +72,64 @@
             <div>
               <button
                 type="button"
-                class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                class="cursor-pointer flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                 aria-expanded="false"
                 data-dropdown-toggle="dropdown-user"
               >
                 <span class="sr-only">Open user menu</span>
                 <img
                   class="w-8 h-8 rounded-full"
-                  src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                  alt="user photo"
+                  :src="DataProfile.profileImage"
+                  :alt="`user-${DataProfile.name}`"
                 />
               </button>
             </div>
             <div
-              class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600"
+              class="z-50 hidden my-4 text-base list-none divide-y rounded-sm shadow-sm bg-gray-700 divide-gray-600"
               id="dropdown-user"
             >
-              <div class="px-4 py-3" role="none">
+              <div class="px-4 py-3 space-y-2" role="none">
                 <p class="text-sm text-gray-900 dark:text-white" role="none">
-                  Neil Sims
+                  {{ DataProfile.name }}
                 </p>
                 <p
                   class="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
                   role="none"
                 >
-                  neil.sims@flowbite.com
+                  {{ DataProfile.email }}
                 </p>
               </div>
               <ul class="py-1" role="none">
                 <li>
-                  <a
-                    href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                  <router-link
+                    to="/dashboard"
+                    active-class=""
+                    exact-active-class=""
+                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white"
                     role="menuitem"
-                    >Settings</a
                   >
+                    Dashboard
+                  </router-link>
+
+                  <router-link
+                    to="/dashboard/profile"
+                    active-class=""
+                    exact-active-class=""
+                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white"
+                    role="menuitem"
+                  >
+                    Profile
+                  </router-link>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                  <button
+                    type="button"
+                    @click="logout"
+                    class="w-full text-left cursor-pointer px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white"
                     role="menuitem"
-                    >Earnings</a
                   >
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                    role="menuitem"
-                    >Sign out</a
-                  >
+                    Logout
+                  </button>
                 </li>
               </ul>
             </div>
@@ -107,6 +147,7 @@
     <div class="h-full px-3 pb-4 overflow-y-auto bg-white">
       <ul class="space-y-2 font-medium">
         <router-link
+          data-drawer-hide="logo-sidebar"
           to="/dashboard"
           class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100"
           exact-active-class="bg-gray-200 text-blue-600 font-semibold"
@@ -114,6 +155,7 @@
           Dashboard
         </router-link>
         <router-link
+          data-drawer-hide="logo-sidebar"
           to="/dashboard/profile"
           class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100"
           exact-active-class="bg-gray-200 text-blue-600 font-semibold"
@@ -121,6 +163,7 @@
           Profile
         </router-link>
         <router-link
+          data-drawer-hide="logo-sidebar"
           to="/dashboard/customer"
           class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100"
           exact-active-class="bg-gray-200 text-blue-600 font-semibold"
@@ -128,6 +171,7 @@
           Customer
         </router-link>
         <router-link
+          data-drawer-hide="logo-sidebar"
           to="/dashboard/transaction"
           class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100"
           exact-active-class="bg-gray-200 text-blue-600 font-semibold"
@@ -135,6 +179,7 @@
           Transaction
         </router-link>
         <button
+          data-drawer-hide="logo-sidebar"
           @click="logout"
           class="cursor-pointer w-full flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100"
           exact-active-class="bg-gray-200 text-blue-600 font-semibold"
@@ -145,21 +190,3 @@
     </div>
   </aside>
 </template>
-
-<script setup>
-import { useRouter } from "vue-router";
-import { d$auth } from "@/stores/auth";
-
-const router = useRouter();
-const authStore = d$auth();
-
-const logout = async () => {
-  try {
-    await authStore.Api$Logout();
-    router.replace({ name: "login" });
-  } catch (err) {
-    console.error(err);
-    errorMessage.value = err || "Logout gagal";
-  }
-};
-</script>

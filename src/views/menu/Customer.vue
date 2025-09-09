@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import Pagination from "@/components/pagination.vue";
 import { storeToRefs } from "pinia";
 import { d$Customer } from "@/stores/customer";
@@ -7,11 +7,15 @@ import { d$General } from "@/stores/general";
 import { toast } from "vue3-toastify";
 import Multiselect from "vue-multiselect";
 import Tambah from "@/components/customer/Tambah.vue";
+import Edit from "@/components/customer/Edit.vue";
+import Detail from "@/components/customer/Detail.vue";
+const isLoading = ref(false);
 const StoreCus = d$Customer();
 const StoreGen = d$General();
 const { GetDataCusParams, GetDataCusList } = storeToRefs(StoreCus);
 const { GetDataProvince, GetDataCity } = storeToRefs(StoreGen);
 
+const HariIni = new Date().toISOString().split("T")[0];
 const DataCity = ref([]);
 const DataProvince = ref([]);
 const selectedCity = ref();
@@ -31,22 +35,22 @@ const totalPages = ref(1);
 const totalData = ref(0);
 const perPage = ref(10);
 
+const params = ref({});
+
 const ApiCusWithParams = async () => {
-  const params = {
+  params.value = {
     page: currentPage.value,
     perPage: perPage.value,
     sortBy: selectedsortBy.value,
     sortDirection: selectedsortDirection.value,
   };
 
-  if (selectedstartDate.value) params.startDate = selectedstartDate.value;
-  if (selectedendDate.value) params.endDate = selectedendDate.value;
-  if (ParamsCustomer.value) params.name = ParamsCustomer.value;
-  if (ParamsProvince.value) params.provinceCode = ParamsProvince.value;
-  if (ParamsCity.value) params.cityCode = ParamsCity.value;
-
-  await GetCusParams(params);
-
+  if (selectedstartDate.value) params.value.startDate = selectedstartDate.value;
+  if (selectedendDate.value) params.value.endDate = selectedendDate.value;
+  if (ParamsCustomer.value) params.value.name = ParamsCustomer.value;
+  if (ParamsProvince.value) params.value.provinceCode = ParamsProvince.value;
+  if (ParamsCity.value) params.value.cityCode = ParamsCity.value;
+  await GetCusParams(params.value);
   currentPage.value = GetDataCusParams.value.currentPage || 0;
   totalPages.value = GetDataCusParams.value.lastPage || 0;
   totalData.value = GetDataCusParams.value.total || 0;
@@ -134,28 +138,13 @@ const GetCusList = async () => {
 };
 
 const GetCusParams = async (params) => {
+  isLoading.value = true;
   try {
     const res = await StoreCus.Api$CusParams(params);
   } catch (err) {
     console.error(err);
-  }
-};
-
-const EditCustomer = async (body) => {
-  try {
-    const res = await StoreCus.Api$EditCustomer(body);
-    toast.success("Data Customer berhasil diubah");
-  } catch (err) {
-    console.error(err);
-  }
-};
-const TambahCustomer = async (body) => {
-  try {
-    const res = await StoreCus.Api$CreateCustomer(body);
-    toast.success("Data Customer berhasil ditambahkan");
-  } catch (err) {
-    console.error(err);
-    errorMessage.value = err || "gagal menambahkan";
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -164,9 +153,23 @@ onMounted(async () => {
   await GetCity();
   await GetProvince();
   await GetCusList();
-  DataCity.value = GetDataCity.value.items;
-  DataProvince.value = GetDataProvince.value.items;
-  DataCustomer.value = GetDataCusList.value.items;
+});
+
+watch(GetDataCity, (newVal) => {
+  if (newVal?.items) {
+    DataCity.value = newVal.items;
+  }
+});
+
+watch(GetDataProvince, (newVal) => {
+  if (newVal?.items) {
+    DataProvince.value = newVal.items;
+  }
+});
+watch(GetDataCusList, (newVal) => {
+  if (newVal?.items) {
+    DataCustomer.value = newVal.items;
+  }
 });
 </script>
 
@@ -175,15 +178,15 @@ onMounted(async () => {
     class="flex flex-col gap-5 border-gray-300 border flex-1 p-6 bg-gray-50 rounded-lg"
   >
     <div class="flex justify-between items-center">
-      <h1 class="text-2xl">Daftar Customer</h1>
+      <h1 class="text-lg md:text-2xl">Daftar Customer</h1>
       <button
         data-modal-target="TambahCutomer"
         data-modal-toggle="TambahCutomer"
-        class="px-3 py-2 cursor-pointer hover:bg-gray-200 text-black md:text-base text-sm border border-gray-400 rounded-md"
+        class="px-3 py-2 cursor-pointer hover:bg-gray-200 text-black md:text-base text-xs border border-gray-400 rounded-md"
       >
         Tambah Customer
       </button>
-      <Tambah id-modal="TambahCutomer" />
+      <Tambah idModal="TambahCutomer" :params="params" />
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
       <div class="flex flex-col space-y-1">
@@ -240,7 +243,8 @@ onMounted(async () => {
         <input
           type="date"
           id="startDate"
-          class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          :max="HariIni"
+          class="rounded-md border w-full border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
           @change="handlestartDate"
         />
       </div>
@@ -250,9 +254,10 @@ onMounted(async () => {
           >End Date</label
         >
         <input
+          :min="HariIni"
           type="date"
           id="endDate"
-          class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          class="rounded-md border w-full border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
           @change="handleendDate"
         />
       </div>
@@ -265,7 +270,7 @@ onMounted(async () => {
           v-model="selectedCustomer"
           :options="DataCustomer || []"
           label="name"
-          track-by="name"
+          track-by="code"
           placeholder="Pilih Nama..."
           :max-height="150"
           @select="handleCustomer"
@@ -305,45 +310,89 @@ onMounted(async () => {
     </div>
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <table class="w-full text-sm text-left rtl:text-right">
-        <thead class="text-xs uppercase bg-gray-700 text-white">
-          <tr>
-            <th class="px-4 py-2">No</th>
-            <th class="px-4 py-2">Nama</th>
-            <th class="px-4 py-2">Provinsi</th>
-            <th class="px-4 py-2">Kota</th>
-            <th class="px-4 py-2">Alamat</th>
-            <th class="px-4 py-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(data, index) in GetDataCusParams.items"
-            :key="data.code"
-            class="bg-white border-b border-gray-200 hover:bg-gray-50"
-          >
-            <td class="px-4 py-2">
-              {{ (currentPage - 1) * perPage + index + 1 }}
-            </td>
-            <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap">
-              {{ data.name }}
-            </td>
-            <td class="px-4 py-2">{{ data.province }}</td>
-            <td class="px-4 py-2">{{ data.city }}</td>
-            <td class="px-4 py-2">{{ data.address }}</td>
-            <td class="px-4 py-2">Edit</td>
-          </tr>
-
-          <tr v-if="totalData === 0">
-            <td
-              colspan="6"
-              class="px-4 py-2 text-center text-gray-900 md:text-base text-sm"
+      <div class="relative w-full min-w-[700px]">
+        <table class="w-full text-sm text-left rtl:text-right">
+          <thead class="text-xs uppercase bg-gray-700 text-white">
+            <tr>
+              <th class="md:px-4 md:py-2 px-2 py-1">No</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Nama</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Provinsi</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Kota</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Alamat</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Action</th>
+            </tr>
+          </thead>
+          <tbody class="">
+            <tr
+              v-for="(data, index) in GetDataCusParams.items"
+              :key="data.code"
+              class="bg-white border-b border-gray-200 hover:bg-gray-50"
             >
-              Data tidak tersedia
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <td class="md:px-4 md:py-2 px-2 py-1">
+                {{ (currentPage - 1) * perPage + index + 1 }}
+              </td>
+              <td
+                class="md:px-4 md:py-2 px-2 py-1 font-medium text-gray-900 whitespace-nowrap"
+              >
+                {{ data.name }}
+              </td>
+              <td class="md:px-4 md:py-2 px-2 py-1">{{ data.province }}</td>
+              <td class="md:px-4 md:py-2 px-2 py-1">{{ data.city }}</td>
+              <td class="md:px-4 md:py-2 px-2 py-1">{{ data.address }}</td>
+              <td class="md:px-4 md:py-2 px-2 py-1 flex items-center gap-3">
+                <button
+                  type="button"
+                  :data-modal-target="`Edit-${data.code}`"
+                  :data-modal-toggle="`Edit-${data.code}`"
+                  class="hover:underline cursor-pointer"
+                >
+                  Edit
+                </button>
+
+                <Edit
+                  :idModal="`Edit-${data.code}`"
+                  :idCustomer="data.code"
+                  :params="params"
+                />
+
+                <button
+                  :data-modal-target="`Detail-${data.code}`"
+                  :data-modal-toggle="`Detail-${data.code}`"
+                  class="hover:underline cursor-pointer"
+                >
+                  Detail
+                </button>
+                <Detail
+                  :idModal="`Detail-${data.code}`"
+                  :idCustomer="data.code"
+                />
+              </td>
+            </tr>
+
+            <tr v-if="totalData === 0">
+              <td
+                colspan="6"
+                class="md:px-4 md:py-2 px-2 py-1 text-center text-gray-900 md:text-base text-sm"
+              >
+                Data tidak tersedia
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div
+          v-if="isLoading"
+          class="absolute inset-0 z-40 flex items-center justify-center bg-gray-900/20"
+        >
+          <Vue3Lottie
+            animationLink="/loading.json"
+            :height="120"
+            :width="120"
+            :loop="true"
+            :autoplay="true"
+            class="p-0 m-0"
+          />
+        </div>
+      </div>
     </div>
     <Pagination
       :currentPage="currentPage"

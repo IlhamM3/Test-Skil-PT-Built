@@ -1,12 +1,14 @@
 <template>
-  <div class="flex items-center justify-between mt-4 w-full">
+  <div
+    class="flex items-center justify-between w-full flex-col-reverse md:flex-row gap-3 md:gap-0"
+  >
     <!-- Info data -->
-    <div class="text-sm text-gray-600">
+    <div class="md:text-sm text-xs text-gray-600">
       Menampilkan {{ showing }} dari {{ totalData }} data
     </div>
 
     <!-- Navigasi pagination -->
-    <div class="flex items-center gap-2 text-sm md:text-base">
+    <div class="flex items-center gap-2 text-xs md:text-base">
       <!-- Prev -->
       <button
         @click="emitPage(currentPage - 1)"

@@ -13,24 +13,24 @@ export const d$General = defineStore("General", {
       try {
         const { data } = await Api$General.GetProvince();
         this.DataProvinsi = data;
-      } catch ({ error, message }) {
-        throw message ?? error;
+      } catch (error) {
+        throw error;
       }
     },
     async Api$City() {
       try {
         const { data } = await Api$General.GetCity();
         this.DataKota = data;
-      } catch ({ error, message }) {
-        throw message ?? error;
+      } catch (error) {
+        throw error;
       }
     },
     async Api$Sales() {
       try {
         const { data } = await Api$General.GetSales();
         this.DataSales = data;
-      } catch ({ error, message }) {
-        throw message ?? error;
+      } catch (error) {
+        throw error;
       }
     },
   },

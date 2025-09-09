@@ -14,32 +14,32 @@ export const d$Summary = defineStore("Summary", {
       try {
         const { data } = await Api$Summary.GetSummariesDaily(params);
         this.DataSummariesDaily = data;
-      } catch ({ error, message }) {
-        throw message ?? error;
+      } catch (error) {
+        throw error;
       }
     },
     async Api$SumMonth(params) {
       try {
         const { data } = await Api$Summary.GetSummariesMonth(params);
         this.DataSummariesMonth = data;
-      } catch ({ error, message }) {
-        throw message ?? error;
+      } catch (error) {
+        throw error;
       }
     },
     async Api$SumYear(params) {
       try {
         const { data } = await Api$Summary.GetSummariesYearly(params);
         this.DataSummariesYear = data;
-      } catch ({ error, message }) {
-        throw message ?? error;
+      } catch (error) {
+        throw error;
       }
     },
     async Api$SumTop(params) {
       try {
         const { data } = await Api$Summary.GetSummariesTopCustomer(params);
         this.DataSummariesTop = data;
-      } catch ({ error, message }) {
-        throw message ?? error;
+      } catch (error) {
+        throw error;
       }
     },
   },

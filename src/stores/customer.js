@@ -30,7 +30,7 @@ export const d$Customer = defineStore("Customer", {
     async Api$DetailCustomer(id) {
       try {
         const { data } = await Api$Customer.DetailCustomer(id);
-        this.DataDetailCustomer = data;
+        return data;
       } catch (error) {
         throw error;
       }
@@ -46,7 +46,9 @@ export const d$Customer = defineStore("Customer", {
     },
     async Api$EditCustomer(code, body) {
       try {
-        const { data } = await Api$Customer.PutCustomer(code, body);
+        const { res } = await Api$Customer.PutCustomer(code, body);
+        const { data } = await Api$Customer.DetailCustomer(code);
+        // console.log(data);
         this.ResPutCus = data;
         return data;
       } catch (error) {

@@ -27,10 +27,10 @@ const GetSummariesYearly = ({ year, salesCode }) => {
   if (salesCode != null) params.salesCode = salesCode;
   return baseApi.get("summaries/yearly-transactions", { params });
 };
-const GetSummariesTopCustomer = ({ startMonth, endMonth, limit }) => {
+const GetSummariesTopCustomer = ({ startDate, endDate, limit }) => {
   const params = {
-    startMonth,
-    endMonth,
+    startDate,
+    endDate,
     limit,
   };
 

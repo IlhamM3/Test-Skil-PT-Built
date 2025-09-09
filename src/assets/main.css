@@ -1,13 +1,22 @@
 @import "./base.css";
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
 @import "tailwindcss";
 @import "flowbite/src/themes/default";
 @import "flowbite";
 @import "vue3-toastify/dist/index.css";
 @import "vue-multiselect/dist/vue-multiselect.min.css";
-
+@import "vue-datepicker-next/index.css";
 /* Chrome, Safari, Edge, Opera */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+.multiselect__tags {
+  border: 1px solid #d1d5db;
+}
+
+.multiselect__single {
+  font-size: 12px;
 }
