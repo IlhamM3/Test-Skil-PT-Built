@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { d$Customer } from "@/stores/customer";
-import { initFlowbite } from "flowbite";
 const StoreCus = d$Customer();
+import { storeToRefs } from "pinia";
+const { GetResPutCus } = storeToRefs(StoreCus);
 
 const nama = ref("");
 const selectedCity = ref();
@@ -20,7 +21,7 @@ const props = defineProps({
   idCustomer: String,
 });
 
-const GetCustometbyId = async (id) => {
+const GetCustomerbyId = async (id) => {
   try {
     const data = await StoreCus.Api$DetailCustomer(id);
     nama.value = data.name;
@@ -39,8 +40,22 @@ const GetCustometbyId = async (id) => {
 };
 
 onMounted(async () => {
-  initFlowbite();
-  GetCustometbyId(props.idCustomer);
+  GetCustomerbyId(props.idCustomer);
+});
+
+watch(GetResPutCus, (newVal) => {
+  if (newVal?.code && newVal.code === props.idCustomer) {
+    nama.value = newVal.name;
+    identityNo.value = newVal.identityNo;
+    npwp.value = newVal.npwp;
+    email.value = newVal.email;
+    phone.value = newVal.phone;
+    mobile_phone.value = newVal.mobilePhone;
+    alamat.value = newVal.address;
+    tipeCompany.value = newVal.companyType;
+    selectedProvince.value = newVal.province.name;
+    selectedCity.value = newVal.city.name;
+  }
 });
 </script>
 

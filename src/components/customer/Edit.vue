@@ -1,9 +1,9 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { d$Customer } from "@/stores/customer";
-import { initFlowbite } from "flowbite";
 const StoreCus = d$Customer();
 import { toast } from "vue3-toastify";
+import { initFlowbite } from "flowbite";
 
 const isLoading = ref(false);
 const nama = ref("");
@@ -29,7 +29,7 @@ const EditCustomer = async () => {
     npwp: npwp.value || null,
     email: email.value || null,
     phone: phone.value || null,
-    mobile_phone: mobile_phone.value || null,
+    mobilePhone: mobile_phone.value || null,
     address: alamat.value || null,
   };
 
@@ -47,7 +47,6 @@ const EditCustomer = async () => {
 const GetCustometbyId = async (id) => {
   try {
     const data = await StoreCus.Api$DetailCustomer(id);
-    // console.log(data);
     nama.value = data.name;
     identityNo.value = data.identityNo;
     npwp.value = data.npwp;
@@ -61,8 +60,10 @@ const GetCustometbyId = async (id) => {
 };
 
 onMounted(async () => {
-  initFlowbite();
-  GetCustometbyId(props.idCustomer);
+  await GetCustometbyId(props.idCustomer);
+  nextTick(() => {
+    initFlowbite();
+  });
 });
 </script>
 
@@ -179,7 +180,7 @@ onMounted(async () => {
               </label>
               <input
                 v-model="phone"
-                type="number"
+                type="text"
                 id="phone"
                 placeholder="Masukan phone"
                 class="w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
@@ -219,6 +220,7 @@ onMounted(async () => {
             </div>
 
             <button
+              :data-modal-hide="idModal"
               type="submit"
               :disabled="!nama || isLoading"
               class="md:col-span-2 text-white font-medium rounded-md text-sm px-5 flex justify-center items-center text-center"

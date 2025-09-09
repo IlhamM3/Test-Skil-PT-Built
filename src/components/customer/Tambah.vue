@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import Multiselect from "vue-multiselect";
 import { d$General } from "@/stores/general";
@@ -60,18 +60,26 @@ const TambahCustomer = async () => {
     npwp.value = "";
     email.value = "";
     phone.value = "";
-    mobile_phone.value = "";
+    mobilePhone.value = "";
     alamat.value = "";
     tipeCompany.value = "";
     selectedProvince.value = null;
     selectedCity.value = null;
   } catch (err) {
-    toast.error(err.response?.data?.errors?.name || "Gagal menambahkan data");
+    console.log(err.response);
+    if (err.response?.data?.errors?.name) {
+      toast.error(err.response.data.errors.name);
+    } else if (err.response?.data?.errors?.phone) {
+      toast.error(err.response.data.errors.phone);
+    } else if (err.response?.data?.errors?.email) {
+      toast.error(err.response.data.errors.email);
+    } else {
+      toast.error("Gagal Menambahkan Data");
+    }
   } finally {
     isLoading.value = false;
   }
 };
-
 const props = defineProps({
   idModal: String,
   params: Object,
@@ -88,7 +96,7 @@ const props = defineProps({
     <div class="relative p-4 w-full max-w-4xl max-h-full">
       <div class="relative bg-white rounded-md shadow-sm">
         <div
-          class="flex items-center justify-between px-2 py-2.5 md:px-4 md:py-4 border-b rounded-t border-gray-200"
+          class="flex items-center justify-between px-3 py-2.5 md:px-4 md:py-4 border-b rounded-t border-gray-200"
         >
           <h3 class="text-base md:text-xl font-semibold text-gray-900">
             Tambah Data Customer
@@ -134,7 +142,7 @@ const props = defineProps({
                 id="nama"
                 required
                 placeholder="Masukan nama"
-                class="w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
+                class="w-full rounded-md px-3 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
               />
             </div>
             <div class="relative w-full">
@@ -149,7 +157,7 @@ const props = defineProps({
                 type="text"
                 id="identityNo"
                 placeholder="Masukan identityNo"
-                class="w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
+                class="w-full rounded-md px-3 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
               />
             </div>
             <div class="relative w-full">
@@ -164,7 +172,7 @@ const props = defineProps({
                 type="text"
                 id="npwp"
                 placeholder="Masukan No NPWP"
-                class="w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
+                class="w-full rounded-md px-3 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
               />
             </div>
             <div class="relative w-full">
@@ -179,7 +187,7 @@ const props = defineProps({
                 type="email"
                 id="email"
                 placeholder="Masukan email"
-                class="w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
+                class="w-full rounded-md px-3 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
               />
             </div>
             <div class="relative w-full">
@@ -191,10 +199,10 @@ const props = defineProps({
               </label>
               <input
                 v-model="phone"
-                type="number"
+                type="text"
                 id="phone"
                 placeholder="Masukan phone"
-                class="w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
+                class="w-full rounded-md px-3 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
               />
             </div>
             <div class="relative w-full">
@@ -209,7 +217,7 @@ const props = defineProps({
                 type="text"
                 id="mobile_phone"
                 placeholder="Masukan Mobile Phone"
-                class="w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
+                class="w-full rounded-md px-3 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
               />
             </div>
             <div class="relative w-full">
@@ -264,7 +272,7 @@ const props = defineProps({
                 id="alamat"
                 required
                 placeholder="Masukan alamat"
-                class="w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
+                class="w-full rounded-md px-3 py-2.5 md:text-sm text-xs border border-gray-300 ring-0"
               />
             </div>
 
@@ -278,7 +286,7 @@ const props = defineProps({
               <select
                 v-model="tipeCompany"
                 id="tipeCompany"
-                class="cursor-pointer w-full rounded-md px-2 py-2.5 md:text-sm text-xs border border-gray-300 text-gray-700"
+                class="cursor-pointer w-full rounded-md px-3 py-2.5 md:text-sm text-xs border border-gray-300 text-gray-700"
               >
                 <option value="" disabled selected hidden>
                   Pilih tipe Company
@@ -289,6 +297,7 @@ const props = defineProps({
             </div>
 
             <button
+              :data-modal-hide="idModal"
               type="submit"
               :disabled="
                 !nama ||
@@ -298,7 +307,7 @@ const props = defineProps({
                 !selectedProvince ||
                 isLoading
               "
-              class="md:col-span-2 text-white font-medium rounded-md text-sm px-5 flex justify-center items-center text-center"
+              class="md:col-span-2 text-white font-medium rounded-md text-sm w-full h-8 flex justify-center items-center text-center"
               :class="
                 !nama ||
                 !alamat ||
@@ -306,8 +315,8 @@ const props = defineProps({
                 !selectedCity ||
                 !selectedProvince ||
                 isLoading
-                  ? 'bg-gray-400 cursor-not-allowed py-0'
-                  : 'bg-green-500 hover:bg-green-400 cursor-pointer py-2'
+                  ? 'bg-gray-400 cursor-not-allowed '
+                  : 'bg-green-500 hover:bg-green-400 cursor-pointer'
               "
             >
               <span v-if="!isLoading">Tambah</span>

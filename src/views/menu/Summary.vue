@@ -1,7 +1,15 @@
+<script setup>
+import Daily from "@/components/Dashboard/Daily.vue";
+import TopCus from "@/components/Dashboard/TopCus.vue";
+import Monthly from "@/components/Dashboard/Monthly.vue";
+import Yearly from "@/components/Dashboard/Yearly.vue";
+</script>
+
 <template>
-  <section
-    class="flex flex-col gap-5 border-gray-300 border flex-1 p-6 bg-gray-50 rounded-lg"
-  >
-    <div>ini halaman dashboard</div>
+  <section class="flex flex-col gap-5">
+    <Daily />
+    <Monthly />
+    <Yearly />
+    <TopCus />
   </section>
 </template>

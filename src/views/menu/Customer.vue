@@ -9,14 +9,13 @@ import Multiselect from "vue-multiselect";
 import Tambah from "@/components/customer/Tambah.vue";
 import Edit from "@/components/customer/Edit.vue";
 import Detail from "@/components/customer/Detail.vue";
-import { initFlowbite } from "flowbite";
-
 const isLoading = ref(false);
 const StoreCus = d$Customer();
 const StoreGen = d$General();
 const { GetDataCusParams, GetDataCusList } = storeToRefs(StoreCus);
 const { GetDataProvince, GetDataCity } = storeToRefs(StoreGen);
 
+const HariIni = new Date().toISOString().split("T")[0];
 const DataCity = ref([]);
 const DataProvince = ref([]);
 const selectedCity = ref();
@@ -150,7 +149,6 @@ const GetCusParams = async (params) => {
 };
 
 onMounted(async () => {
-  initFlowbite();
   await ApiCusWithParams();
   await GetCity();
   await GetProvince();
@@ -171,7 +169,6 @@ watch(GetDataProvince, (newVal) => {
 watch(GetDataCusList, (newVal) => {
   if (newVal?.items) {
     DataCustomer.value = newVal.items;
-    console.log(newVal.items.length);
   }
 });
 </script>
@@ -246,7 +243,8 @@ watch(GetDataCusList, (newVal) => {
         <input
           type="date"
           id="startDate"
-          class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          :max="HariIni"
+          class="rounded-md border w-full border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
           @change="handlestartDate"
         />
       </div>
@@ -256,9 +254,10 @@ watch(GetDataCusList, (newVal) => {
           >End Date</label
         >
         <input
+          :min="HariIni"
           type="date"
           id="endDate"
-          class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          class="rounded-md border w-full border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
           @change="handleendDate"
         />
       </div>
@@ -311,16 +310,16 @@ watch(GetDataCusList, (newVal) => {
     </div>
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <div class="relative w-full">
+      <div class="relative w-full min-w-[700px]">
         <table class="w-full text-sm text-left rtl:text-right">
           <thead class="text-xs uppercase bg-gray-700 text-white">
             <tr>
-              <th class="px-4 py-2">No</th>
-              <th class="px-4 py-2">Nama</th>
-              <th class="px-4 py-2">Provinsi</th>
-              <th class="px-4 py-2">Kota</th>
-              <th class="px-4 py-2">Alamat</th>
-              <th class="px-4 py-2">Action</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">No</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Nama</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Provinsi</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Kota</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Alamat</th>
+              <th class="md:px-4 md:py-2 px-2 py-1">Action</th>
             </tr>
           </thead>
           <tbody class="">
@@ -329,16 +328,18 @@ watch(GetDataCusList, (newVal) => {
               :key="data.code"
               class="bg-white border-b border-gray-200 hover:bg-gray-50"
             >
-              <td class="px-4 py-2">
+              <td class="md:px-4 md:py-2 px-2 py-1">
                 {{ (currentPage - 1) * perPage + index + 1 }}
               </td>
-              <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap">
+              <td
+                class="md:px-4 md:py-2 px-2 py-1 font-medium text-gray-900 whitespace-nowrap"
+              >
                 {{ data.name }}
               </td>
-              <td class="px-4 py-2">{{ data.province }}</td>
-              <td class="px-4 py-2">{{ data.city }}</td>
-              <td class="px-4 py-2">{{ data.address }}</td>
-              <td class="px-4 py-2 flex items-center gap-3">
+              <td class="md:px-4 md:py-2 px-2 py-1">{{ data.province }}</td>
+              <td class="md:px-4 md:py-2 px-2 py-1">{{ data.city }}</td>
+              <td class="md:px-4 md:py-2 px-2 py-1">{{ data.address }}</td>
+              <td class="md:px-4 md:py-2 px-2 py-1 flex items-center gap-3">
                 <button
                   type="button"
                   :data-modal-target="`Edit-${data.code}`"
@@ -371,7 +372,7 @@ watch(GetDataCusList, (newVal) => {
             <tr v-if="totalData === 0">
               <td
                 colspan="6"
-                class="px-4 py-2 text-center text-gray-900 md:text-base text-sm"
+                class="md:px-4 md:py-2 px-2 py-1 text-center text-gray-900 md:text-base text-sm"
               >
                 Data tidak tersedia
               </td>
