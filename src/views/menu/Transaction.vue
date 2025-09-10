@@ -168,7 +168,7 @@ const GetTransParams = async (params) => {
 onMounted(async () => {
   if (GetDataTransaction.value.length === 0) {
     await ApiTransWithParams();
-    initFlowbite();
+    // initFlowbite();
   }
 
   if (GetDataCusList.value.length === 0) {

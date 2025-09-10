@@ -4,12 +4,10 @@ import Pagination from "@/components/pagination.vue";
 import { storeToRefs } from "pinia";
 import { d$Customer } from "@/stores/customer";
 import { d$General } from "@/stores/general";
-import { toast } from "vue3-toastify";
 import Multiselect from "vue-multiselect";
 import Tambah from "@/components/customer/Tambah.vue";
 import Edit from "@/components/customer/Edit.vue";
 import Detail from "@/components/customer/Detail.vue";
-import { initFlowbite } from "flowbite";
 
 const isLoading = ref(false);
 const StoreCus = d$Customer();
@@ -171,7 +169,6 @@ const GetCusParams = async (params) => {
 onMounted(async () => {
   if (GetDataCusParams.value.length === 0) {
     await ApiCusWithParams();
-    initFlowbite();
   }
   if (GetDataCusList.value.length === 0) {
     await GetCusList();
