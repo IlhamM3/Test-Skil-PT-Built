@@ -36,7 +36,8 @@ const EditCustomer = async () => {
   try {
     await StoreCus.Api$EditCustomer(props.idCustomer, body);
     toast.success("Data Customer berhasil diubah");
-    await StoreCus.Api$CusParams(props.params);
+    const res = await StoreCus.Api$CusParams(props.params);
+    console.log(res);
   } catch (err) {
     toast.error(err.response?.data?.errors?.name || "Gagal Mengubah data");
   } finally {
@@ -220,7 +221,6 @@ onMounted(async () => {
             </div>
 
             <button
-              :data-modal-hide="idModal"
               type="submit"
               :disabled="!nama || isLoading"
               class="md:col-span-2 text-white font-medium rounded-md text-sm px-5 flex justify-center items-center text-center"
