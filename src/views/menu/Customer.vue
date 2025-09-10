@@ -51,66 +51,84 @@ const ApiCusWithParams = async () => {
   if (ParamsProvince.value) params.value.provinceCode = ParamsProvince.value;
   if (ParamsCity.value) params.value.cityCode = ParamsCity.value;
   await GetCusParams(params.value);
-  currentPage.value = GetDataCusParams.value.currentPage || 0;
-  totalPages.value = GetDataCusParams.value.lastPage || 0;
-  totalData.value = GetDataCusParams.value.total || 0;
-  perPage.value = GetDataCusParams.value.perPage || 10;
+  setPagination();
 };
 
 const handlePerPage = async (event) => {
   perPage.value = Number(event.target.value);
+  sessionStorage.setItem("perPageCustomer", perPage.value);
   await ApiCusWithParams();
 };
+
 const handlesortBy = async (event) => {
   selectedsortBy.value = event.target.value;
+  sessionStorage.setItem("sortByCustomer", selectedsortBy.value);
   await ApiCusWithParams();
 };
+
 const handlesortDirection = async (event) => {
   selectedsortDirection.value = event.target.value;
+  sessionStorage.setItem("sortDirectionCustomer", selectedsortDirection.value);
   await ApiCusWithParams();
 };
 
 const handlestartDate = async (event) => {
   selectedstartDate.value = event.target.value;
+  sessionStorage.setItem("startDateCustomer", selectedstartDate.value);
   await ApiCusWithParams();
 };
+
 const handleendDate = async (event) => {
   selectedendDate.value = event.target.value;
+  sessionStorage.setItem("endDateCustomer", selectedendDate.value);
   await ApiCusWithParams();
 };
+
 const handleProvince = async (value) => {
   selectedProvince.value = value;
   ParamsProvince.value = value.code;
+  sessionStorage.setItem("provinceCustomer", JSON.stringify(value));
   await ApiCusWithParams();
 };
+
 const handleCity = async (value) => {
   selectedCity.value = value;
   ParamsCity.value = value.code;
+  sessionStorage.setItem("cityCustomer", JSON.stringify(value));
   await ApiCusWithParams();
 };
+
 const handleCustomer = async (value) => {
   selectedCustomer.value = value;
   ParamsCustomer.value = value.name;
+  sessionStorage.setItem("customerCustomer", JSON.stringify(value));
   await ApiCusWithParams();
 };
+
 const RemoveHandleProvince = async () => {
   selectedProvince.value = null;
   ParamsProvince.value = null;
+  sessionStorage.removeItem("provinceCustomer");
   await ApiCusWithParams();
 };
+
 const RemoveHandleCity = async () => {
   selectedCity.value = null;
   ParamsCity.value = null;
+  sessionStorage.removeItem("cityCustomer");
   await ApiCusWithParams();
 };
+
 const RemoveHandleCustomer = async () => {
   selectedCustomer.value = null;
   ParamsCustomer.value = null;
+  sessionStorage.removeItem("customerCustomer");
   await ApiCusWithParams();
 };
 
 const goToPage = async (page) => {
   currentPage.value = page;
+  sessionStorage.setItem("currentPageCustomer", currentPage.value);
   await ApiCusWithParams();
 };
 
@@ -149,23 +167,68 @@ const GetCusParams = async (params) => {
 };
 
 onMounted(async () => {
-  await ApiCusWithParams();
-  await GetCity();
-  await GetProvince();
-  await GetCusList();
-});
+  if (GetDataCusParams.value.length === 0) {
+    await ApiCusWithParams();
+  }
+  if (GetDataCusList.value.length === 0) {
+    await GetCusList();
+  }
+  if (GetDataProvince.value.length === 0) {
+    await GetProvince();
+  }
+  if (GetDataCity.value.length === 0) {
+    await GetCity();
+  }
+  DataProvince.value = GetDataProvince.value.items;
+  DataCustomer.value = GetDataCusList.value.items;
+  DataCity.value = GetDataCity.value.items;
+  setPagination();
 
-watch(GetDataCity, (newVal) => {
-  if (newVal?.items) {
-    DataCity.value = newVal.items;
+  if (sessionStorage.getItem("perPageCustomer")) {
+    perPage.value = Number(sessionStorage.getItem("perPageCustomer"));
+  }
+  if (sessionStorage.getItem("sortByCustomer")) {
+    selectedsortBy.value = sessionStorage.getItem("sortByCustomer");
+  }
+  if (sessionStorage.getItem("sortDirectionCustomer")) {
+    selectedsortDirection.value = sessionStorage.getItem(
+      "sortDirectionCustomer"
+    );
+  }
+  if (sessionStorage.getItem("startDateCustomer")) {
+    selectedstartDate.value = sessionStorage.getItem("startDateCustomer");
+  }
+  if (sessionStorage.getItem("endDateCustomer")) {
+    selectedendDate.value = sessionStorage.getItem("endDateCustomer");
+  }
+  if (sessionStorage.getItem("provinceCustomer")) {
+    selectedProvince.value = JSON.parse(
+      sessionStorage.getItem("provinceCustomer")
+    );
+    ParamsProvince.value = selectedProvince.value.code;
+  }
+  if (sessionStorage.getItem("cityCustomer")) {
+    selectedCity.value = JSON.parse(sessionStorage.getItem("cityCustomer"));
+    ParamsCity.value = selectedCity.value.code;
+  }
+  if (sessionStorage.getItem("customerCustomer")) {
+    selectedCustomer.value = JSON.parse(
+      sessionStorage.getItem("customerCustomer")
+    );
+    ParamsCustomer.value = selectedCustomer.value.name;
+  }
+  if (sessionStorage.getItem("currentPageCustomer")) {
+    currentPage.value = Number(sessionStorage.getItem("currentPageCustomer"));
   }
 });
 
-watch(GetDataProvince, (newVal) => {
-  if (newVal?.items) {
-    DataProvince.value = newVal.items;
-  }
-});
+const setPagination = () => {
+  currentPage.value = GetDataCusParams.value.currentPage || 0;
+  totalPages.value = GetDataCusParams.value.lastPage || 0;
+  totalData.value = GetDataCusParams.value.total || 0;
+  perPage.value = GetDataCusParams.value.perPage || 10;
+};
+
 watch(GetDataCusList, (newVal) => {
   if (newVal?.items) {
     DataCustomer.value = newVal.items;
@@ -196,6 +259,7 @@ watch(GetDataCusList, (newVal) => {
         <select
           id="perPage"
           class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          v-model="perPage"
           @change="handlePerPage"
         >
           <option
@@ -215,6 +279,7 @@ watch(GetDataCusList, (newVal) => {
         <select
           id="sortBy"
           class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          v-model="selectedsortBy"
           @change="handlesortBy"
         >
           <option value="created_at" selected>Created At</option>
@@ -229,6 +294,7 @@ watch(GetDataCusList, (newVal) => {
         <select
           id="sortDirection"
           class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          v-model="selectedsortDirection"
           @change="handlesortDirection"
         >
           <option value="desc" selected>Descending</option>
@@ -245,6 +311,7 @@ watch(GetDataCusList, (newVal) => {
           id="startDate"
           :max="HariIni"
           class="rounded-md border w-full border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          v-model="selectedstartDate"
           @change="handlestartDate"
         />
       </div>
@@ -258,6 +325,7 @@ watch(GetDataCusList, (newVal) => {
           type="date"
           id="endDate"
           class="rounded-md border w-full border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          v-model="selectedendDate"
           @change="handleendDate"
         />
       </div>

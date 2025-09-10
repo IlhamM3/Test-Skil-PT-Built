@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { d$Transaction } from "@/stores/transaction";
+import { initFlowbite } from "flowbite";
 const StoreGen = d$Transaction();
 
 const customer = ref({});
@@ -37,6 +38,9 @@ const GetTransbyId = async (id) => {
 
 onMounted(async () => {
   GetTransbyId(props.idTrans);
+  setTimeout(() => {
+    initFlowbite();
+  }, 1000);
 });
 
 const FormatRP = (amount) => {

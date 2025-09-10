@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted } from "vue";
 import { d$Customer } from "@/stores/customer";
 const StoreCus = d$Customer();
 import { toast } from "vue3-toastify";
@@ -61,9 +61,9 @@ const GetCustometbyId = async (id) => {
 
 onMounted(async () => {
   await GetCustometbyId(props.idCustomer);
-  nextTick(() => {
+  setTimeout(() => {
     initFlowbite();
-  });
+  }, 1000);
 });
 </script>
 
