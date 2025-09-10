@@ -9,7 +9,7 @@ import {
   LinearScale,
 } from "chart.js";
 import { Bar } from "vue-chartjs";
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { d$Summary } from "@/stores/summary";
 import { d$General } from "@/stores/general";
@@ -66,40 +66,60 @@ const ApiSummary = async () => {
 
   if (ParamsSales.value) params.value.salesCode = ParamsSales.value;
   await GetSummaryParams(params.value);
+  DataSummary.value = GetSummariesMonth.value.items;
 };
 
 onMounted(async () => {
-  await ApiSummary();
-  await GetSales();
-});
-
-watch(GetDataSales, (newVal) => {
-  if (newVal?.items) {
-    DataSales.value = newVal.items;
+  if (GetSummariesMonth.value.length === 0) {
+    await ApiSummary();
   }
-});
-watch(GetSummariesMonth, (newVal) => {
-  if (newVal?.items) {
-    DataSummary.value = newVal.items;
+  if (GetDataSales.value.length === 0) {
+    await GetSales();
+  }
+  DataSales.value = GetDataSales.value.items;
+  DataSummary.value = GetSummariesMonth.value.items;
+  const GetSelectedSales = sessionStorage.getItem("SelectedSalesMonthly");
+  const StartDateMonthly = sessionStorage.getItem("StartDateMonthly");
+  const EndDateMonthly = sessionStorage.getItem("EndDateMonthly");
+  if (GetSelectedSales) {
+    const dataSales = JSON.parse(GetSelectedSales);
+    selectedSales.value = dataSales;
+    ParamsSales.value = dataSales.code;
+  }
+  if (StartDateMonthly) {
+    selectedstartDate.value = JSON.parse(StartDateMonthly);
+  }
+  if (EndDateMonthly) {
+    selectedendDate.value = JSON.parse(EndDateMonthly);
   }
 });
 
 const handlestartDate = async (event) => {
   selectedstartDate.value = event.target.value;
+  sessionStorage.setItem(
+    "StartDateMonthly",
+    JSON.stringify(selectedstartDate.value)
+  );
   await ApiSummary();
 };
 const handleendDate = async (event) => {
   selectedendDate.value = event.target.value;
+  sessionStorage.setItem(
+    "EndDateMonthly",
+    JSON.stringify(selectedendDate.value)
+  );
   await ApiSummary();
 };
 const handleSales = async (value) => {
   selectedSales.value = value;
+  sessionStorage.setItem("SelectedSalesMonthly", JSON.stringify(value));
   ParamsSales.value = value.code;
   await ApiSummary();
 };
 const RemoveHandleSales = async () => {
   selectedSales.value = null;
   ParamsSales.value = null;
+  sessionStorage.removeItem("SelectedSalesMonthly");
   await ApiSummary();
 };
 

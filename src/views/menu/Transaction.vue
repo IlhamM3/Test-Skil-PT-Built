@@ -7,6 +7,7 @@ import { d$Transaction } from "@/stores/transaction";
 import { d$General } from "@/stores/general";
 import Multiselect from "vue-multiselect";
 import Detail from "@/components/Transaction/detail.vue";
+import { initFlowbite } from "flowbite";
 
 const isLoading = ref(false);
 const StoreTrans = d$Transaction();
@@ -57,67 +58,78 @@ const ApiTransWithParams = async () => {
   if (ParamsTrans.value) params.value.IdTransaksi = ParamsTrans.value;
 
   await GetTransParams(params.value);
-  DataTrans.value = GetDataTransaction.value.items;
-  currentPage.value = GetDataTransaction.value.currentPage || 0;
-  totalPages.value = GetDataTransaction.value.lastPage || 0;
-  totalData.value = GetDataTransaction.value.total || 0;
-  perPage.value = GetDataTransaction.value.perPage || 10;
+  SetDataTransaction();
 };
 
 const handlePerPage = async (event) => {
   perPage.value = Number(event.target.value);
+  sessionStorage.setItem("PerPageTrans", perPage.value);
   await ApiTransWithParams();
 };
+
 const handlesortBy = async (event) => {
   selectedsortBy.value = event.target.value;
+  sessionStorage.setItem("SortByTrans", selectedsortBy.value);
   await ApiTransWithParams();
 };
+
 const handlesortDirection = async (event) => {
   selectedsortDirection.value = event.target.value;
+  sessionStorage.setItem("SortDirectionTrans", selectedsortDirection.value);
   await ApiTransWithParams();
 };
 
 const handlestartDate = async (event) => {
   selectedstartDate.value = event.target.value;
+  sessionStorage.setItem("StartDateTrans", selectedstartDate.value);
   await ApiTransWithParams();
 };
+
 const handleendDate = async (event) => {
   selectedendDate.value = event.target.value;
+  sessionStorage.setItem("EndDateTrans", selectedendDate.value);
   await ApiTransWithParams();
 };
+
 const handleTrans = async (value) => {
   selectedTrans.value = value;
   ParamsTrans.value = value.referenceNo;
+  sessionStorage.setItem("SelectedTrans", JSON.stringify(value));
   await ApiTransWithParams();
 };
 
 const RemoveHandleTrans = async () => {
   selectedTrans.value = null;
   ParamsTrans.value = null;
+  sessionStorage.removeItem("SelectedTrans");
   await ApiTransWithParams();
 };
 
 const handleSales = async (value) => {
   selectedSales.value = value;
   ParamsSales.value = value.code;
+  sessionStorage.setItem("SelectedSalesTrans", JSON.stringify(value));
   await ApiTransWithParams();
 };
 
 const RemoveHandleSales = async () => {
   selectedSales.value = null;
   ParamsSales.value = null;
+  sessionStorage.removeItem("SelectedSalesTrans");
   await ApiTransWithParams();
 };
 
 const handleCustomer = async (value) => {
   selectedCustomer.value = value;
   ParamsCustomer.value = value.code;
+  sessionStorage.setItem("SelectedCustomerTrans", JSON.stringify(value));
   await ApiTransWithParams();
 };
 
 const RemoveHandleCustomer = async () => {
   selectedCustomer.value = null;
   ParamsCustomer.value = null;
+  sessionStorage.removeItem("SelectedCustomerTrans");
   await ApiTransWithParams();
 };
 
@@ -154,22 +166,65 @@ const GetTransParams = async (params) => {
 };
 
 onMounted(async () => {
-  await ApiTransWithParams();
-  await GetSales();
-  await GetCusList();
-});
+  if (GetDataTransaction.value.length === 0) {
+    await ApiTransWithParams();
+    initFlowbite();
+  }
 
-watch(GetDataSales, (newVal) => {
-  if (newVal?.items) {
-    DataSales.value = newVal.items;
+  if (GetDataCusList.value.length === 0) {
+    await GetCusList();
+  }
+  if (GetDataSales.value.length === 0) {
+    await GetSales();
+  }
+  DataCustomer.value = GetDataCusList.value.items;
+  DataSales.value = GetDataSales.value.items;
+  SetDataTransaction();
+
+  const savedPerPage = sessionStorage.getItem("PerPageTrans");
+  if (savedPerPage) {
+    perPage.value = Number(savedPerPage);
+  }
+  const savedSortBy = sessionStorage.getItem("SortByTrans");
+  if (savedSortBy) {
+    selectedsortBy.value = savedSortBy;
+  }
+  const savedSortDirection = sessionStorage.getItem("SortDirectionTrans");
+  if (savedSortDirection) {
+    selectedsortDirection.value = savedSortDirection;
+  }
+  const savedStartDate = sessionStorage.getItem("StartDateTrans");
+  if (savedStartDate) {
+    selectedstartDate.value = savedStartDate;
+  }
+  const savedEndDate = sessionStorage.getItem("EndDateTrans");
+  if (savedEndDate) {
+    selectedendDate.value = savedEndDate;
+  }
+  const savedTrans = sessionStorage.getItem("SelectedTrans");
+  if (savedTrans) {
+    selectedTrans.value = JSON.parse(savedTrans);
+    ParamsTrans.value = selectedTrans.value.referenceNo;
+  }
+  const savedSales = sessionStorage.getItem("SelectedSalesTrans");
+  if (savedSales) {
+    selectedSales.value = JSON.parse(savedSales);
+    ParamsSales.value = selectedSales.value.code;
+  }
+  const savedCustomer = sessionStorage.getItem("SelectedCustomerTrans");
+  if (savedCustomer) {
+    selectedCustomer.value = JSON.parse(savedCustomer);
+    ParamsCustomer.value = selectedCustomer.value.code;
   }
 });
 
-watch(GetDataCusList, (newVal) => {
-  if (newVal?.items) {
-    DataCustomer.value = newVal.items;
-  }
-});
+const SetDataTransaction = () => {
+  DataTrans.value = GetDataTransaction.value.items;
+  currentPage.value = GetDataTransaction.value.currentPage || 0;
+  totalPages.value = GetDataTransaction.value.lastPage || 0;
+  totalData.value = GetDataTransaction.value.total || 0;
+  perPage.value = GetDataTransaction.value.perPage || 10;
+};
 
 const FormatRP = (amount) => {
   const number = Number(amount);
@@ -179,6 +234,12 @@ const FormatRP = (amount) => {
     minimumFractionDigits: 0,
   }).format(number);
 };
+
+watch(GetDataCusList, (newVal) => {
+  if (newVal?.items) {
+    DataCustomer.value = newVal.items;
+  }
+});
 </script>
 
 <template>
@@ -196,6 +257,7 @@ const FormatRP = (amount) => {
         <select
           id="perPage"
           class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          v-model="perPage"
           @change="handlePerPage"
         >
           <option
@@ -215,6 +277,7 @@ const FormatRP = (amount) => {
         <select
           id="sortBy"
           class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+          v-model="selectedsortBy"
           @change="handlesortBy"
         >
           <option value="created_at" selected>Created At</option>
@@ -226,6 +289,7 @@ const FormatRP = (amount) => {
           >Sort Direction</label
         >
         <select
+          v-model="selectedsortDirection"
           id="sortDirection"
           class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
           @change="handlesortDirection"

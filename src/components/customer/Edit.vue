@@ -1,9 +1,8 @@
 <script setup>
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted } from "vue";
 import { d$Customer } from "@/stores/customer";
 const StoreCus = d$Customer();
 import { toast } from "vue3-toastify";
-import { initFlowbite } from "flowbite";
 
 const isLoading = ref(false);
 const nama = ref("");
@@ -36,6 +35,7 @@ const EditCustomer = async () => {
   try {
     await StoreCus.Api$EditCustomer(props.idCustomer, body);
     toast.success("Data Customer berhasil diubah");
+    console.log(props.params);
     await StoreCus.Api$CusParams(props.params);
   } catch (err) {
     toast.error(err.response?.data?.errors?.name || "Gagal Mengubah data");
@@ -61,9 +61,6 @@ const GetCustometbyId = async (id) => {
 
 onMounted(async () => {
   await GetCustometbyId(props.idCustomer);
-  nextTick(() => {
-    initFlowbite();
-  });
 });
 </script>
 
@@ -220,7 +217,6 @@ onMounted(async () => {
             </div>
 
             <button
-              :data-modal-hide="idModal"
               type="submit"
               :disabled="!nama || isLoading"
               class="md:col-span-2 text-white font-medium rounded-md text-sm px-5 flex justify-center items-center text-center"

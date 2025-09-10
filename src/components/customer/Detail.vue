@@ -4,7 +4,6 @@ import { d$Customer } from "@/stores/customer";
 const StoreCus = d$Customer();
 import { storeToRefs } from "pinia";
 const { GetResPutCus } = storeToRefs(StoreCus);
-
 const nama = ref("");
 const selectedCity = ref();
 const selectedProvince = ref();

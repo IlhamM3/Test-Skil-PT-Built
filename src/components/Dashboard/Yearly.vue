@@ -58,24 +58,34 @@ const ApiSummary = async () => {
 
   if (ParamsSales.value) params.value.salesCode = ParamsSales.value;
   await GetSummaryParams(params.value);
+  DataSummary.value = {
+    current: GetSummariesYear.value.current,
+    previous: GetSummariesYear.value.previous,
+  };
 };
 
 onMounted(async () => {
-  await ApiSummary();
-  await GetSales();
-});
-
-watch(GetDataSales, (newVal) => {
-  if (newVal?.items) {
-    DataSales.value = newVal.items;
+  if (GetSummariesYear.value.length === 0) {
+    await ApiSummary();
   }
-});
-watch(GetSummariesYear, (newVal) => {
-  if (newVal) {
-    DataSummary.value = {
-      current: newVal.current,
-      previous: newVal.previous,
-    };
+  if (GetDataSales.value.length === 0) {
+    await GetSales();
+  }
+  DataSales.value = GetDataSales.value.items;
+  DataSummary.value = {
+    current: GetSummariesYear.value.current,
+    previous: GetSummariesYear.value.previous,
+  };
+
+  const GetSelectedSales = sessionStorage.getItem("SelectedSalesYear");
+  const StartDateYear = sessionStorage.getItem("StartDateYear");
+  if (GetSelectedSales) {
+    const dataSales = JSON.parse(GetSelectedSales);
+    selectedSales.value = dataSales;
+    ParamsSales.value = dataSales.code;
+  }
+  if (StartDateYear) {
+    selectedstartDate.value = JSON.parse(StartDateYear);
   }
 });
 
@@ -83,16 +93,23 @@ const handlestartDate = async (value) => {
   const dateObj = new Date(value);
   const year = dateObj.getFullYear();
   selectedstartDate.value = year;
+  sessionStorage.setItem(
+    "StartDateYear",
+    JSON.stringify(selectedstartDate.value)
+  );
   await ApiSummary();
 };
 const handleSales = async (value) => {
   selectedSales.value = value;
   ParamsSales.value = value.code;
+  sessionStorage.setItem("SelectedSalesYear", JSON.stringify(value));
+
   await ApiSummary();
 };
 const RemoveHandleSales = async () => {
   selectedSales.value = null;
   ParamsSales.value = null;
+  sessionStorage.removeItem("SelectedSalesYear");
   await ApiSummary();
 };
 

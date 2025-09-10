@@ -1,7 +1,11 @@
 <script setup>
 import Navbar from "@/components/Navbar.vue";
 import Footer from "@/components/Footer.vue";
-import { onMounted } from "vue";
+import { onBeforeMount } from "vue";
+
+onBeforeMount(() => {
+  sessionStorage.clear();
+});
 </script>
 
 <template>

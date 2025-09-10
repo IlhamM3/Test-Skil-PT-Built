@@ -45,28 +45,49 @@ const ApiSummary = async () => {
     limit: selectedLimit.value,
   };
   await GetSummaryParams(params.value);
+  DataSummary.value = GetSummariesTop.value.items;
 };
 
 const handlestartDate = async (event) => {
   selectedstartDate.value = event.target.value;
+  sessionStorage.setItem(
+    "StartDateTopCus",
+    JSON.stringify(selectedstartDate.value)
+  );
   await ApiSummary();
 };
 const handleendDate = async (event) => {
   selectedendDate.value = event.target.value;
+  sessionStorage.setItem(
+    "EndDateTopCus",
+    JSON.stringify(selectedendDate.value)
+  );
   await ApiSummary();
 };
 const handleLimit = async (event) => {
   selectedLimit.value = Number(event.target.value);
+  sessionStorage.setItem("LimitTopCus", selectedLimit.value);
   await ApiSummary();
 };
 
-watch(GetSummariesTop, (newVal) => {
-  if (newVal?.items) {
-    DataSummary.value = newVal.items;
-  }
-});
 onMounted(async () => {
-  await ApiSummary();
+  if (GetSummariesTop.value.length === 0) {
+    await ApiSummary();
+  }
+
+  DataSummary.value = GetSummariesTop.value.items;
+  const GetLimit = sessionStorage.getItem("LimitTopCus");
+  const StartDateTopCus = sessionStorage.getItem("StartDateTopCus");
+  const EndDateTopCus = sessionStorage.getItem("EndDateTopCus");
+  if (GetLimit) {
+    selectedLimit.value = GetLimit;
+  }
+  if (StartDateTopCus) {
+    selectedstartDate.value = JSON.parse(StartDateTopCus);
+  }
+  if (EndDateTopCus) {
+    selectedendDate.value = JSON.parse(EndDateTopCus);
+  }
 });
 
 ChartJS.register(
@@ -184,6 +205,7 @@ const chartOptionsTopCus = {
           <select
             id="Limit"
             class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+            v-model="selectedLimit"
             @change="handleLimit"
           >
             <option v-for="n in [3, 7, 15]" :key="n" :value="n">

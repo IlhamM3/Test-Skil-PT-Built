@@ -13,8 +13,12 @@ const newPassword = ref("");
 const newPasswordConfirmation = ref("");
 
 onMounted(async () => {
-  await GetProfile();
-  DataProfile.value = GetDataProfile.value;
+  if (!DataProfile.value) {
+    await GetProfile();
+    DataProfile.value = GetDataProfile.value;
+  } else {
+    DataProfile.value = GetDataProfile.value;
+  }
 });
 
 const GetProfile = async () => {

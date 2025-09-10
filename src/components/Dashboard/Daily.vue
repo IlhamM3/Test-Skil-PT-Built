@@ -59,41 +59,58 @@ const ApiSummary = async () => {
 
   if (ParamsSales.value) params.value.salesCode = ParamsSales.value;
   await GetSummaryParams(params.value);
+  DataSummary.value = GetSummariesDaily.value.items;
 };
 
 onMounted(async () => {
-  await ApiSummary();
-  await GetSales();
-});
-
-watch(GetDataSales, (newVal) => {
-  if (newVal?.items) {
-    DataSales.value = newVal.items;
+  if (GetSummariesDaily.value.length === 0) {
+    await ApiSummary();
   }
-});
-watch(GetSummariesDaily, (newVal) => {
-  if (newVal?.items) {
-    DataSummary.value = newVal.items;
+  if (GetDataSales.value.length === 0) {
+    await GetSales();
+  }
+  DataSales.value = GetDataSales.value.items;
+  DataSummary.value = GetSummariesDaily.value.items;
+  const GetSelectedSales = sessionStorage.getItem("SelectedSalesDaily");
+  const StartDateDaily = sessionStorage.getItem("StartDateDaily");
+  const EndDateDaily = sessionStorage.getItem("EndDateDaily");
+  if (GetSelectedSales) {
+    const dataSales = JSON.parse(GetSelectedSales);
+    selectedSales.value = dataSales;
+    ParamsSales.value = dataSales.code;
+  }
+  if (StartDateDaily) {
+    selectedstartDate.value = JSON.parse(StartDateDaily);
+  }
+  if (EndDateDaily) {
+    selectedendDate.value = JSON.parse(EndDateDaily);
   }
 });
 
 const handlestartDate = async (event) => {
   selectedstartDate.value = event.target.value;
+  sessionStorage.setItem(
+    "StartDateDaily",
+    JSON.stringify(selectedstartDate.value)
+  );
   await ApiSummary();
 };
 const handleendDate = async (event) => {
   selectedendDate.value = event.target.value;
+  sessionStorage.setItem("EndDateDaily", JSON.stringify(selectedendDate.value));
   await ApiSummary();
 };
 const handleSales = async (value) => {
   selectedSales.value = value;
   ParamsSales.value = value.code;
+  sessionStorage.setItem("SelectedSalesDaily", JSON.stringify(value));
   await ApiSummary();
 };
 
 const RemoveHandleSales = async () => {
   selectedSales.value = null;
   ParamsSales.value = null;
+  sessionStorage.removeItem("SelectedSalesDaily");
   await ApiSummary();
 };
 ChartJS.register(

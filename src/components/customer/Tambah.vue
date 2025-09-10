@@ -8,7 +8,6 @@ const StoreGen = d$General();
 const StoreCus = d$Customer();
 const { GetDataProvince, GetDataCity } = storeToRefs(StoreGen);
 import { toast } from "vue3-toastify";
-
 const isLoading = ref(false);
 const selectedCity = ref();
 const selectedProvince = ref();
@@ -43,7 +42,7 @@ const TambahCustomer = async () => {
     npwp: npwp.value || null,
     email: email.value || null,
     phone: phone.value || null,
-    mobile_phone: mobile_phone.value || null,
+    mobilePhone: mobile_phone.value || null,
     provinceCode: selectedProvince.value.code,
     cityCode: selectedCity.value.code,
     address: alamat.value,
@@ -60,13 +59,13 @@ const TambahCustomer = async () => {
     npwp.value = "";
     email.value = "";
     phone.value = "";
-    mobilePhone.value = "";
+    mobile_phone.value = "";
     alamat.value = "";
     tipeCompany.value = "";
     selectedProvince.value = null;
     selectedCity.value = null;
   } catch (err) {
-    console.log(err.response);
+    console.log(err);
     if (err.response?.data?.errors?.name) {
       toast.error(err.response.data.errors.name);
     } else if (err.response?.data?.errors?.phone) {
@@ -80,6 +79,7 @@ const TambahCustomer = async () => {
     isLoading.value = false;
   }
 };
+
 const props = defineProps({
   idModal: String,
   params: Object,
@@ -297,7 +297,6 @@ const props = defineProps({
             </div>
 
             <button
-              :data-modal-hide="idModal"
               type="submit"
               :disabled="
                 !nama ||

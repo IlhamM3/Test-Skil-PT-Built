@@ -3,13 +3,15 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { d$auth } from "@/stores/auth";
 import { storeToRefs } from "pinia";
+
 const router = useRouter();
 const authStore = d$auth();
 const { GetDataProfile } = storeToRefs(authStore);
-
 const DataProfile = ref([]);
 onMounted(async () => {
-  await GetProfile();
+  if (GetDataProfile.value.length === 0) {
+    await GetProfile();
+  }
   DataProfile.value = GetDataProfile.value;
 });
 
@@ -62,7 +64,7 @@ const GetProfile = async () => {
           <a class="flex ms-4 md:me-24">
             <img src="/favicon.ico" class="h-8 me-3" alt="Logo" />
             <span
-              class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white"
+              class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-white"
               >Test Skill</span
             >
           </a>
@@ -72,7 +74,7 @@ const GetProfile = async () => {
             <div>
               <button
                 type="button"
-                class="cursor-pointer flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                class="cursor-pointer flex text-sm bg-gray-300 rounded-full focus:ring-4 focus:ring-gray-300"
                 aria-expanded="false"
                 data-dropdown-toggle="dropdown-user"
               >
@@ -89,13 +91,10 @@ const GetProfile = async () => {
               id="dropdown-user"
             >
               <div class="px-4 py-3 space-y-2" role="none">
-                <p class="text-sm text-gray-900 dark:text-white" role="none">
+                <p class="text-sm text-white" role="none">
                   {{ DataProfile.name }}
                 </p>
-                <p
-                  class="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
-                  role="none"
-                >
+                <p class="text-sm font-medium text-white truncate" role="none">
                   {{ DataProfile.email }}
                 </p>
               </div>
@@ -105,7 +104,7 @@ const GetProfile = async () => {
                     to="/dashboard"
                     active-class=""
                     exact-active-class=""
-                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white"
+                    class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-600 hover:text-white"
                     role="menuitem"
                   >
                     Dashboard
@@ -115,7 +114,7 @@ const GetProfile = async () => {
                     to="/dashboard/profile"
                     active-class=""
                     exact-active-class=""
-                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white"
+                    class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-600 hover:text-white"
                     role="menuitem"
                   >
                     Profile
@@ -125,7 +124,7 @@ const GetProfile = async () => {
                   <button
                     type="button"
                     @click="logout"
-                    class="w-full text-left cursor-pointer px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 hover:text-white"
+                    class="w-full text-left cursor-pointer px-4 py-2 text-sm text-gray-200 hover:bg-gray-600 hover:text-white"
                     role="menuitem"
                   >
                     Logout
