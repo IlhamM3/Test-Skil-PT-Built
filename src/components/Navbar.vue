@@ -16,7 +16,7 @@ onMounted(async () => {
   DataProfile.value = GetDataProfile.value;
   setTimeout(() => {
     initFlowbite();
-  }, 1000);
+  }, 50);
 });
 
 const logout = async () => {

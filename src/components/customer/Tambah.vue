@@ -4,6 +4,8 @@ import { storeToRefs } from "pinia";
 import Multiselect from "vue-multiselect";
 import { d$General } from "@/stores/general";
 import { d$Customer } from "@/stores/customer";
+import { initFlowbite } from "flowbite";
+
 const StoreGen = d$General();
 const StoreCus = d$Customer();
 const { GetDataProvince, GetDataCity } = storeToRefs(StoreGen);
@@ -83,6 +85,12 @@ const TambahCustomer = async () => {
 const props = defineProps({
   idModal: String,
   params: Object,
+});
+
+onMounted(() => {
+  setTimeout(() => {
+    initFlowbite();
+  }, 50);
 });
 </script>
 

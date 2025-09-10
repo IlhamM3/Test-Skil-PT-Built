@@ -40,7 +40,7 @@ onMounted(async () => {
   GetTransbyId(props.idTrans);
   setTimeout(() => {
     initFlowbite();
-  }, 1000);
+  }, 50);
 });
 
 const FormatRP = (amount) => {

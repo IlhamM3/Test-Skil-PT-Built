@@ -63,7 +63,7 @@ onMounted(async () => {
   await GetCustometbyId(props.idCustomer);
   setTimeout(() => {
     initFlowbite();
-  }, 1000);
+  }, 50);
 });
 </script>
 
