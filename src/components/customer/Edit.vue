@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import { d$Customer } from "@/stores/customer";
 const StoreCus = d$Customer();
 import { toast } from "vue3-toastify";
-
+import { initFlowbite } from "flowbite";
 const isLoading = ref(false);
 const nama = ref("");
 const identityNo = ref("");
@@ -61,6 +61,9 @@ const GetCustometbyId = async (id) => {
 
 onMounted(async () => {
   await GetCustometbyId(props.idCustomer);
+  setTimeout(() => {
+    initFlowbite();
+  }, 1000);
 });
 </script>
 

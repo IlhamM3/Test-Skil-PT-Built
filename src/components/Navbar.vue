@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { d$auth } from "@/stores/auth";
 import { storeToRefs } from "pinia";
+import { initFlowbite } from "flowbite";
 
 const router = useRouter();
 const authStore = d$auth();
@@ -13,6 +14,9 @@ onMounted(async () => {
     await GetProfile();
   }
   DataProfile.value = GetDataProfile.value;
+  setTimeout(() => {
+    initFlowbite();
+  }, 1000);
 });
 
 const logout = async () => {
