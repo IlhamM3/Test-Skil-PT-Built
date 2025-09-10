@@ -4,7 +4,6 @@ import { d$Customer } from "@/stores/customer";
 const StoreCus = d$Customer();
 import { storeToRefs } from "pinia";
 const { GetResPutCus } = storeToRefs(StoreCus);
-import { initFlowbite } from "flowbite";
 const nama = ref("");
 const selectedCity = ref();
 const selectedProvince = ref();
@@ -41,9 +40,6 @@ const GetCustomerbyId = async (id) => {
 
 onMounted(async () => {
   GetCustomerbyId(props.idCustomer);
-  setTimeout(() => {
-    initFlowbite();
-  }, 1000);
 });
 
 watch(GetResPutCus, (newVal) => {

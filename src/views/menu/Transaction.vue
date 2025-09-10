@@ -7,6 +7,7 @@ import { d$Transaction } from "@/stores/transaction";
 import { d$General } from "@/stores/general";
 import Multiselect from "vue-multiselect";
 import Detail from "@/components/Transaction/detail.vue";
+import { initFlowbite } from "flowbite";
 
 const isLoading = ref(false);
 const StoreTrans = d$Transaction();
@@ -167,6 +168,7 @@ const GetTransParams = async (params) => {
 onMounted(async () => {
   if (GetDataTransaction.value.length === 0) {
     await ApiTransWithParams();
+    initFlowbite();
   }
 
   if (GetDataCusList.value.length === 0) {

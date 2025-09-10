@@ -3,13 +3,15 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { d$auth } from "@/stores/auth";
 import { storeToRefs } from "pinia";
+
 const router = useRouter();
 const authStore = d$auth();
 const { GetDataProfile } = storeToRefs(authStore);
-
 const DataProfile = ref([]);
 onMounted(async () => {
-  await GetProfile();
+  if (GetDataProfile.value.length === 0) {
+    await GetProfile();
+  }
   DataProfile.value = GetDataProfile.value;
 });
 

@@ -9,6 +9,8 @@ import Multiselect from "vue-multiselect";
 import Tambah from "@/components/customer/Tambah.vue";
 import Edit from "@/components/customer/Edit.vue";
 import Detail from "@/components/customer/Detail.vue";
+import { initFlowbite } from "flowbite";
+
 const isLoading = ref(false);
 const StoreCus = d$Customer();
 const StoreGen = d$General();
@@ -169,6 +171,7 @@ const GetCusParams = async (params) => {
 onMounted(async () => {
   if (GetDataCusParams.value.length === 0) {
     await ApiCusWithParams();
+    initFlowbite();
   }
   if (GetDataCusList.value.length === 0) {
     await GetCusList();

@@ -3,7 +3,6 @@ import { ref, onMounted } from "vue";
 import { d$Customer } from "@/stores/customer";
 const StoreCus = d$Customer();
 import { toast } from "vue3-toastify";
-import { initFlowbite } from "flowbite";
 
 const isLoading = ref(false);
 const nama = ref("");
@@ -36,8 +35,8 @@ const EditCustomer = async () => {
   try {
     await StoreCus.Api$EditCustomer(props.idCustomer, body);
     toast.success("Data Customer berhasil diubah");
-    const res = await StoreCus.Api$CusParams(props.params);
-    console.log(res);
+    console.log(props.params);
+    await StoreCus.Api$CusParams(props.params);
   } catch (err) {
     toast.error(err.response?.data?.errors?.name || "Gagal Mengubah data");
   } finally {
@@ -62,9 +61,6 @@ const GetCustometbyId = async (id) => {
 
 onMounted(async () => {
   await GetCustometbyId(props.idCustomer);
-  setTimeout(() => {
-    initFlowbite();
-  }, 1000);
 });
 </script>
 
